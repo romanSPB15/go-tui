@@ -53,6 +53,9 @@ func (a *app) Redraw() {
 		a.currentPos = pos{0, 0}
 		for idx, c := range a.comp {
 			if c != nil {
+				if len(c.innerText()) > c.MaxWidth() {
+					a.LogFatal("go-tui: text overflow")
+				}
 				c.setIndex(idx)
 				switch c.DisplayMode() {
 				case DisplayInline:
