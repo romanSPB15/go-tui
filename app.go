@@ -162,6 +162,9 @@ func (a *app) Run() {
 		if a.debug {
 			a.log.Close()
 		}
+		if err := recover(); err != nil {
+			a.LogFatal("Произошла panic: %v", err)
+		}
 	}()
 
 	fmt.Fprint(a.f, "\033[?25l")
