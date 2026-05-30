@@ -10,7 +10,7 @@
 * Красить текст
 ## Установка
 ```
-go get -u github.com/...
+go get -u github.com/romanSPB15/go-tui
 ```
 ## Пример использования
 ```go
