@@ -1,5 +1,7 @@
 package tui
 
+import "github.com/eiannone/keyboard"
+
 // Объект компонента приложения.
 type Component interface {
 	innerText() string
