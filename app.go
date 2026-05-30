@@ -66,7 +66,7 @@ func (a *app) Redraw() {
 					a.posComponents = append(a.posComponents, a.currentPos)
 
 					fmt.Fprint(a.f, c.innerText()+strings.Repeat(" ", c.MaxWidth()-len([]rune(stripansi.Strip(c.innerText())))), "  ")
-					a.currentPos.Col += c.MaxWidth() + 2
+					a.currentPos.Col += c.MaxWidth()
 				case DisplayBlock:
 					a.currentPos.Col = 0
 					a.currentPos.Line++
