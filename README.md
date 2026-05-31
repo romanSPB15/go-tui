@@ -1,10 +1,10 @@
 # go-tui: Text User Interface на Go
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Go version](https://img.shields.io/github/go-mod/go-version/romanSPB15/tui)](https://github.com/romanSPB15/go-tui)
 [![Latest release](https://img.shields.io/github/v/release/romanSPB15/tui)](https://github.com/romanSPB15/tui/releases)
+[![Go Reference](https://pkg.go.dev/badge/github.com/romanSPB15/go-tui.svg)](https://pkg.go.dev/github.com/romanSPB15/go-tui)
 
 ## Обзор
-Лёгкая библиотека для TUI на Go. Умеет:
+Лёгкая библиотека для TUI на Go. Может:
 * Создавать надписи
 * Создавать кнопки и настраивать
 * Обрабатывать нажатия клавиатуры

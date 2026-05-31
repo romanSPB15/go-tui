@@ -39,15 +39,18 @@ type app struct {
 
 var currentApp *app
 
+// Components() возвращает список компонентов, добавленных в приложение.
 func (a *app) Components() []Component {
 	return a.comp
 }
 
+// Window() возвращает интерфейс окна приложения. Из него можно получить длину и ширину окна в символах.
 func (a *app) Window() Window {
 	return a.window
 }
 
-// Метод для перерисовки всех компонентов
+// Redraw() перерисовывает все компоненты.
+// Важно: такая перерисовка вызывает мерцание.
 func (a *app) Redraw() {
 	a.access.components(func() {
 		fmt.Fprint(a.f, "\033[2J\033[H")
@@ -99,7 +102,8 @@ func (a *app) Redraw() {
 
 }
 
-// Перерисовать конкретный компонент.
+// RedrawComponent() перерисовывает конкретный компонент.
+// index - это номер компонента, который нужно перерисовать.
 func (a *app) RedrawComponent(index int) {
 	a.access.components(func() {
 		a.LogInfo("RedrawComponent %v", a.posComponents)
@@ -110,12 +114,12 @@ func (a *app) RedrawComponent(index int) {
 	})
 }
 
-// Метод добавления компонент в массив.
+// AddComponents() добавляет компонент в приложение.
 func (a *app) AddComponents(c ...Component) {
 	a.comp = append(a.comp, c...)
 }
 
-// Метод для очистки списка компонентов приложения
+// Clear() очищает список компонентов приложения без перерисовки.
 func (a *app) Clear() {
 	a.comp = []Component{}
 	a.posComponents = []pos{}
@@ -149,7 +153,7 @@ func (am *accessManager) events(f func()) {
 	am.mtxEvents.Unlock()
 }
 
-// Запуск консольного приложения. Если приложение закроется, то будет произведён graceful shutdown и выход из метода.
+// Run() - это блокирующий запуск TUI-приложения. Если пользователь закроет окно, то будет произведён graceful shutdown и выход из метода.
 func (a *app) Run() {
 	if !term.IsTerminal(currentApp.f.Fd()) {
 		a.LogFatal("tui: stdout is not terminal")
@@ -214,21 +218,22 @@ func (a *app) Run() {
 	a.runned = false
 }
 
-// Выход из приложения.
+// Quit() — это принудительный выход из приложения.
 func (a *app) Quit() {
 	close(a.stopCh)
 }
 
-// Возвращает канал сигнализации выхода - окно закрыто или вызван метод App.Quit().
+// Run() возвращает канал сигнализации о выходе.
 func (a *app) OnQuit() <-chan struct{} {
 	return a.stopCh
 }
 
-func (a *app) Runned() bool {
+// IsRunned() возращает true, если приложение запущено. Иначе возвращает false.
+func (a *app) IsRunned() bool {
 	return a.runned
 }
 
-// Метод создаёт объект приложения без логирования.
+// NewApp() создаёт объект приложения без логирования.
 func NewApp() App {
 	app := &app{f: os.Stdout, stopCh: make(chan struct{}), keyHandlers: make(map[keyboard.Key]func()),
 		window: &window{}, debug: false, access: newAccessManager(),
@@ -237,7 +242,7 @@ func NewApp() App {
 	return app
 }
 
-// Метод создаёт объект приложения без логирования.
+// NewDebugApp() создаёт объект приложения с логированием.
 func NewDebugApp() App {
 	f, err := os.Create(fmt.Sprintf("debug_log_%s", uuid.New().String()))
 	if err != nil {
@@ -250,27 +255,22 @@ func NewDebugApp() App {
 	return app
 }
 
-// Метод добавляет обработчик нажатия клавиши.
+// AddKeyHandler() добавляет обработчик нажатия клавиши.
 func (a *app) AddKeyHandler(key keyboard.Key, h func()) {
 	a.keyHandlers[key] = h
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Система логирования приложения
+// LogInfo() логирует указанное сообщение подобно fmt.Printf() в файл, если приложение создано как Debug.
+func (a *app) LogInfo(message string, args ...any) {
+	if a.debug {
+		fmt.Fprintf(a.log, message+"\r\n", args...)
+	}
+}
 
-// Критическая ошибка с выходом.
-// Ничего не выводит если приложение не создано как Debug
+// LogFatal() логирует указанное сообщение подобно fmt.Printf() в файл, если приложение создано как Debug. Потом в любом случае выходит
 func (a *app) LogFatal(message string, args ...any) {
 	if a.debug {
 		fmt.Fprintf(a.log, message+"\r\n", args...)
 	}
 	os.Exit(1)
-}
-
-// Логирования сообщения как fmt.Printf(), но с переносом строки в конце.
-// Ничего не выводит если приложение не создано как Debug
-func (a *app) LogInfo(message string, args ...any) {
-	if a.debug {
-		fmt.Fprintf(a.log, message+"\r\n", args...)
-	}
 }

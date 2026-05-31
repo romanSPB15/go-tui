@@ -6,10 +6,10 @@ import (
 )
 
 func main() {
-	a := tui.NewApp()
-	a.AddComponents(tui.NewStaticLabel("Привет, Go!"))
-	btn := tui.NewButton("Нажми ↑", keyboard.KeyArrowUp)
-	btn.OnClick = a.Quit
-	a.AddComponents(btn)
-	a.Run()
+	a := tui.NewApp()                                    // Создаём приложение
+	a.AddComponents(tui.NewStaticLabel("Привет, TUI!"))  // Добавляем надпись
+	btn := tui.NewButton("Нажми ↑", keyboard.KeyArrowUp) // Создаём кнопку
+	btn.OnClick = a.Quit                                 // Назначаем обработчик
+	a.AddComponents(btn)                                 //Добавляем кнопку
+	a.Run()                                              // Запускаем приложение
 }

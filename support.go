@@ -8,7 +8,7 @@ import (
 	"golang.org/x/sys/windows"
 )
 
-// Включает поддержку ANSI в терминале в случае если нет
+// EnableANSI() включает поддержку ANSI в терминале в случае если нет(Windows)
 func EnableANSI() {
 	if runtime.GOOS != "windows" {
 		return
