@@ -241,6 +241,10 @@ func (p *ColorProgress) setIndex(idx int) {
 	p.base.setIndex(idx)
 }
 
+func (p *ColorProgress) DisplayMode() DisplayMode {
+	return DisplayInline
+}
+
 func NewColorProgress(len int, on, off Color) *ColorProgress {
 	return &ColorProgress{
 		base:   *NewDynamicLabel(strings.Repeat(" ", len), len),
