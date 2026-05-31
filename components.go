@@ -223,6 +223,8 @@ func (btn *Button) setIndex(idx int) {
 	btn.clicked.setIndex(idx)
 }
 
+// Компонент шкалы прогресса.
+// Добавлено в TUI v1.2.0
 type ColorProgress struct {
 	text          string
 	size          int
@@ -230,6 +232,8 @@ type ColorProgress struct {
 	idx           int
 }
 
+// Установка значения прогресса. Диапазон 0-1
+// Добавлено в TUI v1.2.0
 func (p *ColorProgress) SetValue(f float64) {
 	on := int(float64(p.size) * f)
 	p.text = fmt.Sprintf("\033[%dm%s\033[%dm%s\033[0m", p.clrOn+10, strings.Repeat(" ", on), p.clrOff+10, strings.Repeat(" ", p.size-on))
@@ -254,6 +258,11 @@ func (p *ColorProgress) innerText() string {
 	return p.text
 }
 
+// Создание компонента шкалы прогресса.
+// len - максимальная длина в пикселях
+// on - цвет "включенных" пикселей
+// off - цвет "выключенных" пикселей
+// Добавлено в TUI v1.2.0
 func NewColorProgress(len int, on, off Color) *ColorProgress {
 	return &ColorProgress{
 		text:   strings.Repeat(" ", len),

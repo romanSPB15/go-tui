@@ -155,7 +155,7 @@ func (a *app) Run() {
 		a.LogFatal("tui: stdout is not terminal")
 	}
 	if runtime.GOOS == "windows" { // Windows не поддерживает ANSI escape sequnces по умолчанию.
-		EnableANSI()
+		go EnableANSI()
 	}
 	a.runned = true
 	a.Redraw()
