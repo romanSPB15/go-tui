@@ -233,7 +233,9 @@ type ColorProgress struct {
 func (p *ColorProgress) SetValue(f float64) {
 	on := int(float64(p.size) * f)
 	p.text = fmt.Sprintf("\033[%dm%s\033[%dm%s\033[0m", p.clrOn+10, strings.Repeat(" ", on), p.clrOff+10, strings.Repeat(" ", p.size-on))
-	currentApp.RedrawComponent(p.idx)
+	if currentApp.Runned() {
+		currentApp.RedrawComponent(p.idx)
+	}
 }
 
 func (p *ColorProgress) setIndex(idx int) {

@@ -19,15 +19,16 @@ type App interface {
 	RedrawComponent(int)
 	AddComponents(...Component)
 	Clear()
+
 	Run()
+	Runned() bool
+
 	Quit()
 	OnQuit() <-chan struct{}
 
 	Window() Window
 
 	AddKeyHandler(key keyboard.Key, h func())
-
-	// Встроенное логирование.
 
 	LogInfo(message string, args ...any)
 	LogFatal(message string, args ...any)

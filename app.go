@@ -34,6 +34,7 @@ type app struct {
 	log           io.WriteCloser
 	debug         bool
 	access        *accessManager
+	runned        bool
 }
 
 var currentApp *app
@@ -156,7 +157,7 @@ func (a *app) Run() {
 	if runtime.GOOS == "windows" { // Windows не поддерживает ANSI escape sequnces по умолчанию.
 		EnableANSI()
 	}
-	currentApp = a
+	a.runned = true
 	a.Redraw()
 
 	defer func() {
@@ -210,6 +211,7 @@ func (a *app) Run() {
 	<-a.stopCh
 	fmt.Print("\033[?25l")
 	fmt.Fprint(a.f, "\033[2J\033[H\033[?25h")
+	a.runned = false
 }
 
 // Выход из приложения.
@@ -217,9 +219,13 @@ func (a *app) Quit() {
 	close(a.stopCh)
 }
 
-// Возвращает канал сигнализации выхода - приложение закрыто или вызван метод App.Quit().
+// Возвращает канал сигнализации выхода - окно закрыто или вызван метод App.Quit().
 func (a *app) OnQuit() <-chan struct{} {
 	return a.stopCh
+}
+
+func (a *app) Runned() bool {
+	return a.runned
 }
 
 // Метод создаёт объект приложения без логирования.
