@@ -35,7 +35,7 @@ const (
 	BrightWhite
 )
 
-// DisplayMode  — это режим отображения виджета.
+// DisplayMode — это режим отображения виджета.
 type DisplayMode int
 
 const (
@@ -127,8 +127,8 @@ func (lbl *Label) Blink() *Label {
 	return lbl
 }
 
-// MaxWidth() реализует интерфейс Component
-func (lbl *Label) MaxWidth() int {
+// MaxLength() реализует интерфейс Component
+func (lbl *Label) MaxLength() int {
 	return lbl.maxLength
 }
 
@@ -155,7 +155,7 @@ func (l *spaser) DisplayMode() DisplayMode {
 	return DisplayBlock
 }
 
-func (l *spaser) MaxWidth() int {
+func (l *spaser) MaxLength() int {
 	return 0
 }
 
@@ -176,7 +176,7 @@ func (l *newLine) DisplayMode() DisplayMode {
 	return DisplayNewLine
 }
 
-func (l *newLine) MaxWidth() int {
+func (l *newLine) MaxLength() int {
 	return 0
 }
 
@@ -251,7 +251,7 @@ func (p *ColorProgress) DisplayMode() DisplayMode {
 	return DisplayInline
 }
 
-func (p *ColorProgress) MaxWidth() int {
+func (p *ColorProgress) MaxLength() int {
 	return p.size
 }
 

@@ -57,20 +57,20 @@ func (a *app) Redraw() {
 		a.currentPos = pos{0, 0}
 		for idx, c := range a.comp {
 			if c != nil {
-				if len(stripansi.Strip(c.innerText())) > c.MaxWidth() {
+				if len(stripansi.Strip(c.innerText())) > c.MaxLength() {
 					a.LogFatal("go-tui: text overflow")
 				}
 				c.setIndex(idx)
 				switch c.DisplayMode() {
 				case DisplayInline:
-					if a.currentPos.Col+c.MaxWidth() >= a.window.Width() {
+					if a.currentPos.Col+c.MaxLength() >= a.window.Width() {
 						a.currentPos.Col = 0
 						a.currentPos.Line++
 					}
 					a.posComponents = append(a.posComponents, a.currentPos)
 
-					fmt.Fprint(a.f, c.innerText()+strings.Repeat(" ", c.MaxWidth()-len([]rune(stripansi.Strip(c.innerText())))))
-					a.currentPos.Col += c.MaxWidth()
+					fmt.Fprint(a.f, c.innerText()+strings.Repeat(" ", c.MaxLength()-len([]rune(stripansi.Strip(c.innerText())))))
+					a.currentPos.Col += c.MaxLength()
 				case DisplayBlock:
 					a.currentPos.Col = 0
 					a.currentPos.Line++
@@ -79,7 +79,7 @@ func (a *app) Redraw() {
 
 					a.posComponents = append(a.posComponents, a.currentPos)
 
-					fmt.Fprint(a.f, c.innerText()+strings.Repeat(" ", c.MaxWidth()-len([]rune(stripansi.Strip(c.innerText())))))
+					fmt.Fprint(a.f, c.innerText()+strings.Repeat(" ", c.MaxLength()-len([]rune(stripansi.Strip(c.innerText())))))
 
 					fmt.Fprintln(a.f)
 
@@ -109,7 +109,7 @@ func (a *app) RedrawComponent(index int) {
 		pos := a.posComponents[index]
 		fmt.Fprintf(a.f, "\033[%d;%dH", pos.Line+1, pos.Col+1)
 		a.LogInfo("%v %d", pos, index)
-		fmt.Print(a.comp[index].innerText() + strings.Repeat(" ", a.comp[index].MaxWidth()-len(stripansi.Strip(a.comp[index].innerText()))))
+		fmt.Print(a.comp[index].innerText() + strings.Repeat(" ", a.comp[index].MaxLength()-len(stripansi.Strip(a.comp[index].innerText()))))
 	})
 }
 

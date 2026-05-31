@@ -7,7 +7,7 @@ type Component interface {
 	innerText() string // innerText() возращает текст виджета
 	setIndex(int)
 
-	MaxWidth() int // MaxWidth() возращает длину текста виджета без учёта ANSI Escape последовательностей
+	MaxLength() int // MaxLength() возращает длину текста виджета без учёта ANSI Escape последовательностей
 	DisplayMode() DisplayMode
 }
 
