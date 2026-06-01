@@ -49,7 +49,7 @@ func (c *Canvas) InnerText() (res string) {
 	lastClr := Color(-1)
 	for y := 0; y < c.height; y++ {
 		for x := 0; x < c.width; x++ {
-			clr := c.pole[y][x]
+			clr := c.pole[x][y]
 			if lastClr != clr {
 				if clr == 0 {
 					res += "\033[0m"
@@ -68,7 +68,7 @@ func (c *Canvas) InnerText() (res string) {
 
 // MaxLength() реализует интерфейс Widget
 func (c *Canvas) MaxLength() int {
-	return (c.width + 2) * c.height
+	return (c.width*2 + 2) * c.height
 }
 
 // DisplayMode() реализует интерфейс Widget
