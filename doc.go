@@ -2,7 +2,7 @@
 //
 // Библиотека go-tui позволяет легко создавать интерактивные TUI-приложения.
 // Она включает в себя набор готовых компонентов: кнопки, надписи,
-// цветной прогресс-бар и другие.
+// прогресс-бар и другие.
 //
 // Быстрый старт:
 //
@@ -14,10 +14,10 @@
 
 //	func main() {
 //		a := tui.NewApp()
-//		a.AddComponents(tui.NewStaticLabel("Привет, Go!"))
+//		a.AddWidgets(tui.NewStaticLabel("Привет, Go!"))
 //		btn := tui.NewButton("Нажми ↑", keyboard.KeyArrowUp)
 //		btn.OnClick = a.Quit
-//		a.AddComponents(btn)
+//		a.AddWidgets(btn)
 //		a.Run()
 //	}
 package tui

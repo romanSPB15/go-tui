@@ -9,7 +9,7 @@ import (
 
 // EnableANSI() включает поддержку ANSI в терминале в случае если нет(Windows)
 func EnableANSI() {
-	if runtime.GOOS != "windows" {
+	if runtime.GOOS != "windows" { // Если не требуется, закрываем
 		return
 	}
 	stdout := windows.Handle(os.Stdout.Fd())

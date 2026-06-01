@@ -23,23 +23,23 @@ type pos struct {
 }
 
 type app struct {
-	comp          []Component
-	f             *os.File
-	stopCh        chan struct{}
-	keyHandlers   map[keyboard.Key]func()
-	currentPos    pos
-	posComponents []pos
-	window        Window
-	log           io.WriteCloser
-	debug         bool
-	access        *accessManager
-	runned        bool
+	comp        []Widget
+	f           *os.File
+	stopCh      chan struct{}
+	keyHandlers map[keyboard.Key]func()
+	currentPos  pos
+	posWidgets  []pos
+	window      Window
+	log         io.WriteCloser
+	debug       bool
+	access      *accessManager
+	runned      bool
 }
 
 var currentApp *app
 
-// Components() возвращает список компонентов, добавленных в приложение.
-func (a *app) Components() []Component {
+// Widgets() возвращает список компонентов, добавленных в приложение.
+func (a *app) Widgets() []Widget {
 	return a.comp
 }
 
@@ -51,25 +51,25 @@ func (a *app) Window() Window {
 // Redraw() перерисовывает все компоненты.
 // Важно: такая перерисовка вызывает мерцание.
 func (a *app) Redraw() {
-	a.access.components(func() {
+	a.access.Widgets(func() {
 		fmt.Fprint(a.f, "\033[2J\033[H")
-		a.posComponents = []pos{}
+		a.posWidgets = []pos{}
 		a.currentPos = pos{0, 0}
 		for idx, c := range a.comp {
 			if c != nil {
-				if len(stripansi.Strip(c.innerText())) > c.MaxLength() {
+				if len(stripansi.Strip(c.InnerText())) > c.MaxLength() {
 					a.LogFatal("go-tui: text overflow")
 				}
-				c.setIndex(idx)
+				c.SetIndex(idx)
 				switch c.DisplayMode() {
 				case DisplayInline:
 					if a.currentPos.Col+c.MaxLength() >= a.window.Width() {
 						a.currentPos.Col = 0
 						a.currentPos.Line++
 					}
-					a.posComponents = append(a.posComponents, a.currentPos)
+					a.posWidgets = append(a.posWidgets, a.currentPos)
 
-					fmt.Fprint(a.f, c.innerText()+strings.Repeat(" ", c.MaxLength()-len([]rune(stripansi.Strip(c.innerText())))))
+					fmt.Fprint(a.f, c.InnerText()+strings.Repeat(" ", c.MaxLength()-len([]rune(stripansi.Strip(c.InnerText())))))
 					a.currentPos.Col += c.MaxLength()
 				case DisplayBlock:
 					a.currentPos.Col = 0
@@ -77,9 +77,9 @@ func (a *app) Redraw() {
 
 					fmt.Fprintln(a.f)
 
-					a.posComponents = append(a.posComponents, a.currentPos)
+					a.posWidgets = append(a.posWidgets, a.currentPos)
 
-					fmt.Fprint(a.f, c.innerText()+strings.Repeat(" ", c.MaxLength()-len([]rune(stripansi.Strip(c.innerText())))))
+					fmt.Fprint(a.f, c.InnerText()+strings.Repeat(" ", c.MaxLength()-len([]rune(stripansi.Strip(c.InnerText())))))
 
 					fmt.Fprintln(a.f)
 
@@ -87,7 +87,7 @@ func (a *app) Redraw() {
 					a.currentPos.Line++
 				case DisplayNewLine:
 
-					a.posComponents = append(a.posComponents, a.currentPos)
+					a.posWidgets = append(a.posWidgets, a.currentPos)
 
 					a.currentPos.Col = 0
 					a.currentPos.Line++
@@ -101,27 +101,27 @@ func (a *app) Redraw() {
 
 }
 
-// RedrawComponent() перерисовывает конкретный компонент.
+// RedrawWidget() перерисовывает конкретный компонент.
 // index - это номер компонента, который нужно перерисовать.
-func (a *app) RedrawComponent(index int) {
-	a.access.components(func() {
-		a.LogInfo("RedrawComponent %v", a.posComponents)
-		pos := a.posComponents[index]
+func (a *app) RedrawWidget(index int) {
+	a.access.Widgets(func() {
+		a.LogInfo("RedrawWidget %v", a.posWidgets)
+		pos := a.posWidgets[index]
 		fmt.Fprintf(a.f, "\033[%d;%dH", pos.Line+1, pos.Col+1)
 		a.LogInfo("%v %d", pos, index)
-		fmt.Print(a.comp[index].innerText() + strings.Repeat(" ", a.comp[index].MaxLength()-len(stripansi.Strip(a.comp[index].innerText()))))
+		fmt.Print(a.comp[index].InnerText() + strings.Repeat(" ", a.comp[index].MaxLength()-len(stripansi.Strip(a.comp[index].InnerText()))))
 	})
 }
 
-// AddComponents() добавляет компонент в приложение.
-func (a *app) AddComponents(c ...Component) {
+// AddWidgets() добавляет компонент в приложение.
+func (a *app) AddWidgets(c ...Widget) {
 	a.comp = append(a.comp, c...)
 }
 
 // Clear() очищает список компонентов приложения без перерисовки.
 func (a *app) Clear() {
-	a.comp = []Component{}
-	a.posComponents = []pos{}
+	a.comp = []Widget{}
+	a.posWidgets = []pos{}
 }
 
 // cursor
@@ -129,21 +129,21 @@ func (a *app) Clear() {
 // show \033[?25h
 
 type accessManager struct {
-	mtxComponents *sync.Mutex
-	mtxEvents     *sync.Mutex
+	mtxWidgets *sync.Mutex
+	mtxEvents  *sync.Mutex
 }
 
 func newAccessManager() *accessManager {
 	return &accessManager{
-		mtxComponents: &sync.Mutex{},
-		mtxEvents:     &sync.Mutex{},
+		mtxWidgets: &sync.Mutex{},
+		mtxEvents:  &sync.Mutex{},
 	}
 }
 
-func (am *accessManager) components(f func()) {
-	am.mtxComponents.Lock()
+func (am *accessManager) Widgets(f func()) {
+	am.mtxWidgets.Lock()
 	f()
-	am.mtxComponents.Unlock()
+	am.mtxWidgets.Unlock()
 }
 
 func (am *accessManager) events(f func()) {

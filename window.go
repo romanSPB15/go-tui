@@ -9,7 +9,7 @@ type window struct{}
 func (*window) Width() int {
 	w, _, err := term.GetSize(currentApp.f.Fd())
 	if err != nil {
-		currentApp.LogFatal("tui: window size error")
+		currentApp.LogFatal("tui: get window size error")
 	}
 	return w
 }
@@ -17,7 +17,7 @@ func (*window) Width() int {
 func (*window) Height() int {
 	_, h, err := term.GetSize(currentApp.f.Fd())
 	if err != nil {
-		currentApp.LogFatal("tui: window size error")
+		currentApp.LogFatal("tui: get window size error")
 	}
 	return h
 }

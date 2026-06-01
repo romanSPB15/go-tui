@@ -1,15 +1,18 @@
+//go:build !nocanvas && !nostandart
+
 package tui
 
 import "fmt"
 
 // Canvas — это многострочный виджет, на котором можно "рисовать".
+// В символах Canvas в 2 раза шире чем указано при создании, чтобы пиксели были квадратные а не прямоугольные.
 type Canvas struct {
 	width, height int
 	pole          [][]Color
 	idx           int
 }
 
-// NewCanvas() создаёт виждет Canvas.
+// NewCanvas() создаёт виждет Canvas.ы
 func NewCanvas(width, height int) *Canvas {
 	p := make([][]Color, height)
 	for i := range height {
@@ -37,21 +40,25 @@ func (c *Canvas) DrawAndRender(x, y int, clr Color) {
 	}
 	c.pole[x][y] = clr
 	if currentApp.IsRunned() {
-		currentApp.RedrawComponent(c.idx)
+		currentApp.RedrawWidget(c.idx)
 	}
 }
 
-// innerText() реализует интерфейс Component
-func (c *Canvas) innerText() (res string) {
+// InnerText() реализует интерфейс Widget
+func (c *Canvas) InnerText() (res string) {
 	lastClr := Color(-1)
 	for y := 0; y < c.height; y++ {
 		for x := 0; x < c.width; x++ {
 			clr := c.pole[y][x]
 			if lastClr != clr {
-				res += fmt.Sprintf("\033[%dm", clr)
+				if clr == 0 {
+					res += "\033[0m"
+				} else {
+					res += fmt.Sprintf("\033[%dm", clr+10)
+				}
 				lastClr = clr
 			}
-			res += " "
+			res += "  " // 2 пробела чтобы придать пикселям более квадратную форму
 		}
 		res += "\r\n"
 	}
@@ -59,17 +66,17 @@ func (c *Canvas) innerText() (res string) {
 	return
 }
 
-// MaxLength() реализует интерфейс Component
+// MaxLength() реализует интерфейс Widget
 func (c *Canvas) MaxLength() int {
 	return (c.width + 2) * c.height
 }
 
-// DisplayMode() реализует интерфейс Component
+// DisplayMode() реализует интерфейс Widget
 func (*Canvas) DisplayMode() DisplayMode {
 	return DisplayBlock
 }
 
-// setIndex() реализует интерфейс Component
-func (c *Canvas) setIndex(idx int) {
+// SetIndex() реализует интерфейс Widget
+func (c *Canvas) SetIndex(idx int) {
 	c.idx = idx
 }

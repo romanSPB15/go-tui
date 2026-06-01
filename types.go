@@ -2,10 +2,10 @@ package tui
 
 import "github.com/eiannone/keyboard"
 
-// Component— это интерфейс любого TUI-виджета.
-type Component interface {
-	innerText() string // innerText() возращает текст виджета
-	setIndex(int)
+// Widget — это интерфейс для любого TUI-виджета.
+type Widget interface {
+	InnerText() string // InnerText() возращает текст виджета
+	SetIndex(int)      // SetIndex() устанавливает индекс компонента для перерисовки только его.
 
 	MaxLength() int // MaxLength() возращает длину текста виджета без учёта ANSI Escape последовательностей
 	DisplayMode() DisplayMode
@@ -13,12 +13,12 @@ type Component interface {
 
 // App — это объект приложения.
 type App interface {
-	Components() []Component    // Components() возвращает список компонентов, добавленных в приложение.
-	AddComponents(...Component) // AddComponents() добавляет компонент в приложение.
-	Clear()                     // Clear() очищает список компонентов приложения без перерисовки.
+	Widgets() []Widget    // Widgets() возвращает список компонентов, добавленных в приложение.
+	AddWidgets(...Widget) // AddWidgets() добавляет компонент в приложение.
+	Clear()               // Clear() очищает список компонентов приложения без перерисовки.
 
-	Redraw()             // Redraw() перерисовывает все компоненты. Важно: такая перерисовка вызывает мерцание.
-	RedrawComponent(int) // RedrawComponent() перерисовывает конкретный компонент. index — это номер компонента, который нужно перерисовать.
+	Redraw()          // Redraw() перерисовывает все компоненты. Важно: такая перерисовка вызывает мерцание.
+	RedrawWidget(int) // RedrawWidget() перерисовывает конкретный компонент. index — это номер компонента, который нужно перерисовать.
 
 	Run()           // Run() — это блокирующий запуск TUI-приложения. Если пользователь закроет окно, то будет произведён graceful shutdown и выход из метода.
 	IsRunned() bool // IsRunned() возращает true, если приложение запущено. Иначе возвращает false.

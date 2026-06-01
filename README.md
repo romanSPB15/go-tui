@@ -6,7 +6,7 @@
 ## Обзор
 Лёгкая библиотека для TUI на Go. Может:
 * Создавать надписи
-* Создавать кнопки и настраивать
+* Создавать и настраивать кнопки
 * Обрабатывать нажатия клавиатуры
 * Красить текст
 ## Установка
@@ -24,10 +24,10 @@ import (
 
 func main() {
 	a := tui.NewApp()
-	a.AddComponents(tui.NewStaticLabel("Привет, Go!"))
+	a.AddWidgets(tui.NewStaticLabel("Привет, Go!"))
 	btn := tui.NewButton("Нажми ↑", keyboard.KeyArrowUp)
 	btn.OnClick = a.Quit
-	a.AddComponents(btn)
+	a.AddWidgets(btn)
 	a.Run()
 }
 ```

@@ -1,3 +1,5 @@
+//go:build !nostandart
+
 package tui
 
 import (
@@ -46,17 +48,17 @@ const (
 
 // Label — это виджет текстовой метки.
 type Label struct {
-	decoration string
-	Text       string // Текст виджета.
-	maxLength  int
-	Block      bool // Отображение в блочном режиме.
+	ANSI      string // Приставка ANSI escape последовательности
+	Text      string // Текст виджета.
+	maxLength int
+	Block     bool // Отображение в блочном режиме.
 }
 
-func (l *Label) innerText() string {
-	if l.decoration == "" {
+func (l *Label) InnerText() string {
+	if l.ANSI == "" {
 		return l.Text
 	}
-	return fmt.Sprintf("%s%s\033[0m", l.decoration, l.Text)
+	return fmt.Sprintf("%s%s\033[0m", l.ANSI, l.Text)
 }
 
 // NewStaticLabel() создаёт виджет текста.
@@ -71,68 +73,75 @@ func NewDynamicLabel(txt string, maxLength int) *Label {
 // ColorizeForeground() окрашивает текст в один из стандартных цветов.
 // Добавлено в TUI v1.1.0
 func (lbl *Label) ColorizeForeground(clr Color) *Label {
-	lbl.decoration += fmt.Sprintf("\033[%dm", clr)
+	lbl.ANSI += fmt.Sprintf("\033[%dm", clr)
 	return lbl
 }
 
 // ColorizeBackground() окрашивает фон текста в один из стандартных цветов.
 // Добавлено в TUI v1.1.0
 func (lbl *Label) ColorizeBackground(clr Color) *Label {
-	lbl.decoration += fmt.Sprintf("\033[%dm", clr+10)
+	lbl.ANSI += fmt.Sprintf("\033[%dm", clr+10)
 	return lbl
 }
 
 // ColorizeForegroundRGB() окрашивает текст в RGB.
 // Добавлено в TUI v1.1.0
 func (lbl *Label) ColorizeForegroundRGB(r, g, b uint8) *Label {
-	lbl.decoration += fmt.Sprintf("\033[38;2;%d;%d;%dm", r, g, b)
+	lbl.ANSI += fmt.Sprintf("\033[38;2;%d;%d;%dm", r, g, b)
 	return lbl
 }
 
 // ColorizeBackgroundRGB() окрашивает фон текста в RGB.
 // Добавлено в TUI v1.1.0
 func (lbl *Label) ColorizeBackgroundRGB(r, g, b uint8) *Label {
-	lbl.decoration += fmt.Sprintf("\033[48;2;%d;%d;%dm", r, g, b)
+	lbl.ANSI += fmt.Sprintf("\033[48;2;%d;%d;%dm", r, g, b)
 	return lbl
 }
 
 // Bold() делает текст жирным.
 func (lbl *Label) Bold() *Label {
-	lbl.decoration += "\033[1m"
+	lbl.ANSI += "\033[1m"
 	return lbl
 }
 
 // Italic() делает текст курсивом.
 func (lbl *Label) Italic() *Label {
-	lbl.decoration += "\033[3m"
+	lbl.ANSI += "\033[3m"
 	return lbl
 }
 
 // Underline() подчеркивает текст.
 func (lbl *Label) Underline() *Label {
-	lbl.decoration += "\033[4m"
+	lbl.ANSI += "\033[4m"
 	return lbl
 }
 
 // Reverse() реверсирует цвет текста.
 func (lbl *Label) Reverse() *Label {
-	lbl.decoration += "\033[7m"
+	lbl.ANSI += "\033[7m"
+	return lbl
+}
+
+// Reset() убирает все декорации текста.
+// Добавлено в TUI v1.5.0
+func (lbl *Label) Reset() *Label {
+	lbl.ANSI = ""
 	return lbl
 }
 
 // Blink() делает текст мигающим(работает не во всем терминалах).
 // Добавлено в TUI v1.1.0
 func (lbl *Label) Blink() *Label {
-	lbl.decoration += "\033[7m"
+	lbl.ANSI += "\033[7m"
 	return lbl
 }
 
-// MaxLength() реализует интерфейс Component
+// MaxLength() реализует интерфейс Widget
 func (lbl *Label) MaxLength() int {
 	return lbl.maxLength
 }
 
-// DisplayMode() реализует интерфейс Component
+// DisplayMode() реализует интерфейс Widget
 func (lbl *Label) DisplayMode() DisplayMode {
 	if lbl.Block {
 		return DisplayBlock
@@ -140,14 +149,14 @@ func (lbl *Label) DisplayMode() DisplayMode {
 	return DisplayInline
 }
 
-// setIndex() реализует интерфейс Component
-func (l *Label) setIndex(int) {}
+// SetIndex() реализует интерфейс Widget
+func (l *Label) SetIndex(int) {}
 
 /////////////////////////////////////////////////////////////////////////////////
 
 type spaser struct{}
 
-func (l *spaser) innerText() string {
+func (l *spaser) InnerText() string {
 	return ""
 }
 
@@ -159,16 +168,16 @@ func (l *spaser) MaxLength() int {
 	return 0
 }
 
-func (l *spaser) setIndex(int) {}
+func (l *spaser) SetIndex(int) {}
 
 // Spaser() создаёт пустой компонент, занимающий всю строку для визуального разделения.
-func Spaser() Component { return &spaser{} }
+func Spaser() Widget { return &spaser{} }
 
 /////////////////////////////////////////////////////////////////////////////////
 
 type newLine struct{}
 
-func (l *newLine) innerText() string {
+func (l *newLine) InnerText() string {
 	return ""
 }
 
@@ -180,17 +189,17 @@ func (l *newLine) MaxLength() int {
 	return 0
 }
 
-func (l *newLine) setIndex(int) {}
+func (l *newLine) SetIndex(int) {}
 
 // NewLine() создаёт компонент, занимающий весь остаток его строки, что переносит следующие на новую строку.
-func NewLine() Component { return &newLine{} }
+func NewLine() Widget { return &newLine{} }
 
 // Button это объект кнопки, нажимающейся от нажатия её клавиши. Обработчик в OnClick.
 type Button struct {
-	clicked Component
-	base    Component
+	clicked Widget
+	base    Widget
 	OnClick func()
-	Component
+	Widget
 	idx int
 }
 
@@ -202,26 +211,26 @@ func NewButton(text string, key keyboard.Key) *Button {
 		base:    NewStaticLabel(text),
 		OnClick: func() {},
 	}
-	btn.Component = btn.base
+	btn.Widget = btn.base
 	currentApp.AddKeyHandler(key, func() {
 		if btn.OnClick != nil {
 			btn.OnClick()
 		}
-		btn.Component = btn.clicked
-		currentApp.RedrawComponent(btn.idx)
-		currentApp.LogInfo("%d %s", btn.idx, btn.innerText())
+		btn.Widget = btn.clicked
+		currentApp.RedrawWidget(btn.idx)
+		currentApp.LogInfo("%d %s", btn.idx, btn.InnerText())
 		time.Sleep(time.Millisecond * 50)
-		btn.Component = btn.base
-		currentApp.LogInfo("%d %s", btn.idx, btn.innerText())
-		currentApp.RedrawComponent(btn.idx)
+		btn.Widget = btn.base
+		currentApp.LogInfo("%d %s", btn.idx, btn.InnerText())
+		currentApp.RedrawWidget(btn.idx)
 	})
 	return btn
 }
 
-func (btn *Button) setIndex(idx int) {
+func (btn *Button) SetIndex(idx int) {
 	btn.idx = idx
-	btn.base.setIndex(idx)
-	btn.clicked.setIndex(idx)
+	btn.base.SetIndex(idx)
+	btn.clicked.SetIndex(idx)
 }
 
 // ColorProgress — это виджет шкалы прогресса.
@@ -231,32 +240,6 @@ type ColorProgress struct {
 	size          int
 	clrOn, clrOff Color
 	idx           int
-}
-
-// SetValue() устанавливает значение прогресса. Диапазон 0-1
-// Добавлено в TUI v1.2.0
-func (p *ColorProgress) SetValue(f float64) {
-	on := int(float64(p.size) * f)
-	p.text = fmt.Sprintf("\033[%dm%s\033[%dm%s\033[0m", p.clrOn+10, strings.Repeat(" ", on), p.clrOff+10, strings.Repeat(" ", p.size-on))
-	if currentApp.IsRunned() {
-		currentApp.RedrawComponent(p.idx)
-	}
-}
-
-func (p *ColorProgress) setIndex(idx int) {
-	p.idx = idx
-}
-
-func (p *ColorProgress) DisplayMode() DisplayMode {
-	return DisplayInline
-}
-
-func (p *ColorProgress) MaxLength() int {
-	return p.size
-}
-
-func (p *ColorProgress) innerText() string {
-	return p.text
 }
 
 // NewColorProgress() cоздаёт виджет шкалы прогресса.
@@ -271,4 +254,30 @@ func NewColorProgress(len int, on, off Color) *ColorProgress {
 		clrOn:  on,
 		clrOff: off,
 	}
+}
+
+// SetValue() устанавливает значение прогресса. Диапазон 0-1
+// Добавлено в TUI v1.2.0
+func (p *ColorProgress) SetValue(f float64) {
+	on := int(float64(p.size) * f)
+	p.text = fmt.Sprintf("\033[%dm%s\033[%dm%s\033[0m", p.clrOn+10, strings.Repeat(" ", on), p.clrOff+10, strings.Repeat(" ", p.size-on))
+	if currentApp.IsRunned() {
+		currentApp.RedrawWidget(p.idx)
+	}
+}
+
+func (p *ColorProgress) SetIndex(idx int) {
+	p.idx = idx
+}
+
+func (p *ColorProgress) DisplayMode() DisplayMode {
+	return DisplayInline
+}
+
+func (p *ColorProgress) MaxLength() int {
+	return p.size
+}
+
+func (p *ColorProgress) InnerText() string {
+	return p.text
 }
