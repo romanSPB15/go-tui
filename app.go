@@ -62,6 +62,7 @@ type pos struct {
 type task struct {
 	done chan struct{}
 	f    func()
+	msg  string
 }
 
 type app struct {
@@ -93,7 +94,7 @@ func (a *app) Window() Window {
 // Redraw() перерисовывает все компоненты. Он потокобезопасен.
 // Важно: такая перерисовка вызывает мерцание.
 func (a *app) Redraw() {
-	a.DoAndWait(func() {
+	a.doWithMessageAndWait(func() {
 		fmt.Fprint(a.f, "\033[2J\033[H")
 		a.posWidgets = []pos{}
 		a.currentPos = pos{0, 0}
@@ -139,35 +140,34 @@ func (a *app) Redraw() {
 				}
 			}
 		}
-	})
-
+	}, "redraw all")
 }
 
 // RedrawWidget() перерисовывает конкретный компонент. Потокобезопасен.
 // index - это номер компонента, который нужно перерисовать.
 func (a *app) RedrawWidget(index int) {
-	a.DoAndWait(func() {
+	a.doWithMessageAndWait(func() {
 		a.LogInfo("RedrawWidget %v", a.posWidgets)
 		pos := a.posWidgets[index]
 		fmt.Fprintf(a.f, "\033[%d;%dH", pos.Line+1, pos.Col+1)
 		a.LogInfo("%v %d", pos, index)
 		fmt.Print(a.comp[index].InnerText() + strings.Repeat(" ", a.comp[index].MaxLength()-len(stripansi.Strip(a.comp[index].InnerText()))))
-	})
+	}, "redraw widget")
 }
 
 // AddWidgets() добавляет компонент в приложение. Потокобезопасен.
 func (a *app) AddWidgets(c ...Widget) {
-	a.DoAndWait(func() {
+	a.doWithMessageAndWait(func() {
 		a.comp = append(a.comp, c...)
-	})
+	}, "add widget")
 }
 
 // Clear() очищает список компонентов приложения без перерисовки. Потокобезопасен.
 func (a *app) Clear() {
-	a.DoAndWait(func() {
+	a.doWithMessageAndWait(func() {
 		a.comp = []Widget{}
 		a.posWidgets = []pos{}
-	})
+	}, "clear")
 }
 
 // cursor
@@ -218,7 +218,7 @@ func (a *app) Run() {
 			if ev.Key == keyboard.KeyCtrlC {
 				close(a.stopCh)
 			}
-			a.DoAndWait(func() {
+			a.doWithMessageAndWait(func() {
 				if v, ok := a.keyHandlers[ev.Key]; ok {
 					a.Do(v)
 				} else if ev.Err != nil {
@@ -228,7 +228,7 @@ func (a *app) Run() {
 					}
 					a.LogFatal("tui: keyboard error")
 				}
-			})
+			}, "key handler")
 		}
 	}()
 
@@ -311,7 +311,25 @@ func (a *app) DoAndWait(f func()) {
 	<-tsk.done
 }
 
+func (a *app) doWithMessage(f func(), msg string) {
+	a.work <- &task{
+		f:   f,
+		msg: msg,
+	}
+}
+
+func (a *app) doWithMessageAndWait(f func(), msg string) {
+	tsk := &task{
+		f:    f,
+		done: make(chan struct{}),
+		msg:  msg,
+	}
+	a.work <- tsk
+	<-tsk.done
+}
+
 func (a *app) runWorker() {
+	a.LogInfo("Воркер запущен...")
 	for {
 		select {
 		case <-a.stopCh:
@@ -319,8 +337,12 @@ func (a *app) runWorker() {
 			keyboard.Close()
 			fmt.Print("\033[?25l")
 			fmt.Fprint(a.f, "\033[2J\033[H\033[?25h")
+			a.LogInfo("Воркер остановлен...")
 			return
 		case tsk := <-a.work:
+			if tsk.msg != "" {
+				a.LogInfo("Задача %s", tsk.msg)
+			}
 			tsk.f()
 			if tsk.done != nil {
 				close(tsk.done)
