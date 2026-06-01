@@ -74,7 +74,6 @@ type app struct {
 	window      Window
 	log         io.WriteCloser
 	debug       bool
-	access      *accessManager
 	runned      bool
 	work        chan *task
 }
@@ -263,10 +262,12 @@ func (a *app) IsRunned() bool {
 	return a.runned
 }
 
+const taskBufSize = 16
+
 // NewApp() создаёт объект приложения без логирования.
 func NewApp() App {
 	app := &app{f: os.Stdout, stopCh: make(chan struct{}), keyHandlers: make(map[keyboard.Key]func()),
-		window: &window{}, debug: false, access: newAccessManager(), work: make(chan task, 4),
+		window: &window{}, debug: false, work: make(chan *task, taskBufSize),
 	}
 	currentApp = app
 	return app
@@ -279,7 +280,7 @@ func NewDebugApp() App {
 		log.Fatal(err)
 	}
 	app := &app{log: f, f: os.Stdout, stopCh: make(chan struct{}), keyHandlers: make(map[keyboard.Key]func()),
-		window: &window{}, debug: true, access: newAccessManager(), work: make(chan task, 4),
+		window: &window{}, debug: true, work: make(chan *task, taskBufSize),
 	}
 	currentApp = app
 	return app
