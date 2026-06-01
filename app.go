@@ -341,7 +341,9 @@ func (a *app) runWorker() {
 			return
 		case tsk := <-a.work:
 			if tsk.msg != "" {
-				a.LogInfo("Задача %s", tsk.msg)
+				a.LogInfo("Принята задача: '%s'", tsk.msg)
+			} else {
+				a.LogInfo("Принята задача")
 			}
 			tsk.f()
 			if tsk.done != nil {
