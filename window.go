@@ -193,9 +193,7 @@ func (w *window) Run() {
 		time.Sleep(time.Second * 3)
 		w.LogFatal("tui: stdout is not terminal")
 	}
-	if runtime.GOOS == "windows" {
-		enableANSI()
-	}
+
 	w.index()
 	w.runned = true
 
@@ -302,6 +300,9 @@ func NewWindow() Window {
 			log.Fatal(err)
 		}
 		wnd.log = f
+	}
+	if runtime.GOOS == "windows" {
+		enableANSI()
 	}
 	currentWindow = wnd
 	go wnd.runWorker()
