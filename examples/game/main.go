@@ -9,6 +9,8 @@ func main() {
 	w := tui.NewWindow()
 	cnv := tui.NewCanvas(10, 10)
 
+	w.DisableFocusChange()
+
 	x, y := 0, 0
 	cnv.Draw(0, 0, tui.White)
 

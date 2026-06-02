@@ -79,6 +79,7 @@ type window struct {
 	log         io.WriteCloser
 	runned      bool
 	work        chan *task
+	focusChange bool
 }
 
 // Widgets() возвращает список компонентов, добавленных в приложение.
@@ -140,7 +141,6 @@ func (w *window) index() {
 
 				w.currentPos.Col = 0
 				w.currentPos.Line++
-
 			}
 		}
 	}
@@ -237,28 +237,30 @@ func (w *window) Run() {
 		}
 	}()
 
-	w.RegisterKeyHandler(keyboard.KeyArrowLeft, func() {
-		if w.focusIndex <= 0 {
-			return
-		}
-		w.compF[w.focusIndex].OnBlur()
-		w.focusIndex--
-		w.compF[w.focusIndex].OnFocus()
-	})
+	if w.focusChange {
+		w.RegisterKeyHandler(keyboard.KeyTab, func() {
+			if w.focusIndex <= 0 {
+				return
+			}
+			w.compF[w.focusIndex].OnBlur()
+			w.focusIndex--
+			w.compF[w.focusIndex].OnFocus()
+		})
 
-	w.RegisterKeyHandler(keyboard.KeyArrowRight, func() {
-		if w.focusIndex > len(w.compF)-2 {
-			return
-		}
-		if w.focusIndex == -1 {
-			w.compF[0].OnFocus()
-			w.focusIndex = 0
-			return
-		}
-		w.compF[w.focusIndex].OnBlur()
-		w.focusIndex++
-		w.compF[w.focusIndex].OnFocus()
-	})
+		w.RegisterKeyHandler(keyboard.KeyTab, func() {
+			if w.focusIndex > len(w.compF)-2 {
+				return
+			}
+			if w.focusIndex == -1 {
+				w.compF[0].OnFocus()
+				w.focusIndex = 0
+				return
+			}
+			w.compF[w.focusIndex].OnBlur()
+			w.focusIndex++
+			w.compF[w.focusIndex].OnFocus()
+		})
+	}
 
 	w.RegisterKeyHandler(keyboard.KeyEnter, func() {
 		if w.focusIndex != -1 {
@@ -295,7 +297,7 @@ const taskBufSize = 32
 // NewWindow() создаёт объект приложения без логирования.
 func NewWindow() Window {
 	wnd := &window{f: os.Stdout, stopCh: make(chan struct{}), keyHandlers: make(map[keyboard.Key]func()),
-		work: make(chan *task, taskBufSize), focusIndex: -1,
+		work: make(chan *task, taskBufSize), focusIndex: -1, focusChange: true,
 	}
 	if DEBUG {
 		f, err := os.Create(fmt.Sprintf("debug_log_%d", time.Now().UnixMilli()))
@@ -393,6 +395,10 @@ func (wnd *window) Height() int {
 		wnd.LogFatal("tui: get window size error")
 	}
 	return h
+}
+
+func (wnd *window) DisableFocusChange() {
+	wnd.focusChange = false
 }
 
 func CurrentWindow() Window {
