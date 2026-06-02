@@ -192,7 +192,7 @@ func (a *app) Run() {
 		a.LogFatal("tui: stdout is not terminal")
 	}
 	if runtime.GOOS == "windows" {
-		EnableANSI()
+		enableANSI()
 	}
 	a.runned = true
 
@@ -255,7 +255,7 @@ func (a *app) IsRunned() bool {
 	return a.runned
 }
 
-const taskBufSize = 16
+const taskBufSize = 32
 
 // NewApp() создаёт объект приложения без логирования.
 func NewApp() App {
@@ -281,25 +281,9 @@ func NewDebugApp() App {
 	return app
 }
 
-// AddKeyHandler() добавляет обработчик нажатия клавиши.
-func (a *app) AddKeyHandler(key keyboard.Key, h func()) {
+// RegisterKeyHandler() добавляет обработчик нажатия клавиши.
+func (a *app) RegisterKeyHandler(key keyboard.Key, h func()) {
 	a.keyHandlers[key] = h
-}
-
-// LogInfo() логирует указанное сообщение подобно fmt.Printf() в файл, если приложение создано как Debug.
-func (a *app) LogInfo(message string, args ...any) {
-	if a.debug {
-		fmt.Fprintf(a.log, message+"\r\n", args...)
-	}
-}
-
-// LogFatal() логирует указанное сообщение подобно fmt.Printf() в файл, если приложение создано как Debug. Потом в любом случае выходит
-func (a *app) LogFatal(message string, args ...any) {
-	recoveryScreen(fmt.Sprintf(message, args...))
-	if a.debug {
-		fmt.Fprintf(a.log, message+"\r\n", args...)
-	}
-	os.Exit(1)
 }
 
 // Do() запускает функцию f в потоке GUI, что спасает от data racing при изменении виджетов.

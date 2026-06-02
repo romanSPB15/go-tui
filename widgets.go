@@ -1,4 +1,4 @@
-//go:build !nostandart
+//go:build !no_widgets
 
 package tui
 
@@ -176,7 +176,7 @@ func NewButton(text string, key keyboard.Key) *Button {
 		OnClick: func() {},
 	}
 	btn.Widget = btn.base
-	currentApp.AddKeyHandler(key, func() {
+	currentApp.RegisterKeyHandler(key, func() {
 		if btn.OnClick != nil {
 			btn.OnClick()
 		}

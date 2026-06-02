@@ -1,4 +1,4 @@
-//go:build !nocanvas && !nostandart
+//go:build !no_widgets && !no_canvas
 
 package tui
 

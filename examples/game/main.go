@@ -12,22 +12,23 @@ func main() {
 	x, y := 0, 0
 	cnv.Draw(0, 0, tui.White)
 
-	a.AddKeyHandler(keyboard.KeyArrowDown, func() {
+	// Назначаем обработчики
+	a.RegisterKeyHandler(keyboard.KeyArrowDown, func() {
 		cnv.DrawAndRender(x, y, tui.NoColor) // Замазываем следы
 		y++
 		cnv.DrawAndRender(x, y, tui.White)
 	})
-	a.AddKeyHandler(keyboard.KeyArrowUp, func() {
+	a.RegisterKeyHandler(keyboard.KeyArrowUp, func() {
 		cnv.DrawAndRender(x, y, tui.NoColor)
 		y--
 		cnv.DrawAndRender(x, y, tui.White)
 	})
-	a.AddKeyHandler(keyboard.KeyArrowLeft, func() {
+	a.RegisterKeyHandler(keyboard.KeyArrowLeft, func() {
 		cnv.DrawAndRender(x, y, tui.NoColor)
 		x--
 		cnv.DrawAndRender(x, y, tui.White)
 	})
-	a.AddKeyHandler(keyboard.KeyArrowRight, func() {
+	a.RegisterKeyHandler(keyboard.KeyArrowRight, func() {
 		cnv.DrawAndRender(x, y, tui.NoColor) //
 		x++
 		cnv.DrawAndRender(x, y, tui.White)

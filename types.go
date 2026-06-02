@@ -28,7 +28,7 @@ type App interface {
 
 	Window() Window // Window() возвращает интерфейс окна приложения. Из него можно получить длину и ширину окна в символах.
 
-	AddKeyHandler(key keyboard.Key, h func()) // AddKeyHandler() регистрирует обработчик нажатия указанной клавиши
+	RegisterKeyHandler(key keyboard.Key, h func()) // RegisterKeyHandler() регистрирует обработчик нажатия указанной клавиши
 
 	LogInfo(message string, args ...any)  // LogInfo() логирует указанное сообщение подобно fmt.Printf() в файл, если приложение создано как Debug.
 	LogFatal(message string, args ...any) // LogFatal() логирует указанное сообщение подобно fmt.Printf() в файл, если приложение создано как Debug. Потом в любом случае выходит

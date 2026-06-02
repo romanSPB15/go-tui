@@ -1,17 +1,14 @@
+//go:build windows
+
 package tui
 
 import (
 	"os"
-	"runtime"
 
 	"golang.org/x/sys/windows"
 )
 
-// EnableANSI() включает поддержку ANSI в терминале в случае если нет(Windows)
-func EnableANSI() {
-	if runtime.GOOS != "windows" { // Если не требуется, закрываем
-		return
-	}
+func enableANSI() {
 	stdout := windows.Handle(os.Stdout.Fd())
 	var mode uint32
 	if err := windows.GetConsoleMode(stdout, &mode); err != nil {
