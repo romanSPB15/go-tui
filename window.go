@@ -108,6 +108,7 @@ func (w *window) Redraw() {
 func (w *window) index() {
 	w.compF = []Focusable{}
 	w.posWidgets = []pos{}
+	w.currentPos = pos{0, 0}
 	for idx, c := range w.comp {
 		if c != nil {
 			if len(stripansi.Strip(c.InnerText())) > c.MaxLength() {
@@ -268,6 +269,8 @@ func (w *window) Run() {
 	})
 
 	w.Redraw()
+
+	w.startScreenResizeChecker()
 
 	<-w.stopCh
 }
