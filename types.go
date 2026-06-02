@@ -11,7 +11,14 @@ type Widget interface {
 	DisplayMode() DisplayMode
 }
 
-// App — это объект окна приложения.
+// Focusable это интерфейс виджетов, которые могут получить фокус
+type Focusable interface {
+	Widget
+	OnFocus() // вызывается, когда виджет получил фокус
+	OnBlur()  // вызывается, когда фокус ушёл
+}
+
+// Window — это объект окна приложения.
 type Window interface {
 	Widgets() []Widget    // Widgets() возвращает список компонентов, добавленных в приложение.
 	AddWidgets(...Widget) // AddWidgets() добавляет компонент в приложение.

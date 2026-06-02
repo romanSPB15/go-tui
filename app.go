@@ -68,15 +68,16 @@ type task struct {
 var currentWindow Window
 
 type window struct {
-	comp        []Widget
-	f           *os.File
-	stopCh      chan struct{}
-	keyHandlers map[keyboard.Key]func()
-	currentPos  pos
-	posWidgets  []pos
-	log         io.WriteCloser
-	runned      bool
-	work        chan *task
+	comp                []Widget
+	f                   *os.File
+	stopCh              chan struct{}
+	keyHandlers         map[keyboard.Key]func()
+	currentPos          pos
+	posWidgets          []pos
+	WidgetsposFocusable []pos
+	log                 io.WriteCloser
+	runned              bool
+	work                chan *task
 }
 
 // Widgets() возвращает список компонентов, добавленных в приложение.
@@ -89,8 +90,7 @@ func (w *window) Widgets() []Widget {
 func (w *window) Redraw() {
 	w.doWithMessage(func() {
 		fmt.Fprint(w.f, "\033[2J\033[H")
-		w.posWidgets = []pos{}
-		w.currentPos = pos{0, 0}
+
 		for idx, c := range w.comp {
 			if c != nil {
 				if len(stripansi.Strip(c.InnerText())) > c.MaxLength() {
@@ -230,6 +230,11 @@ func (w *window) Run() {
 	w.Redraw()
 
 	<-w.stopCh
+}
+
+func (w *window) index() {
+	w.posWidgets = []pos{}
+	w.currentPos = pos{0, 0}
 }
 
 // Quit() — это принудительный выход из приложения.

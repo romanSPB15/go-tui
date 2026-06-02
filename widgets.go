@@ -206,10 +206,10 @@ type ColorProgress struct {
 	idx           int
 }
 
-// NewColorProgress() cоздаёт виджет шкалы прогресса.
-// len — максимальная длина в пикселях
-// on — цвет "включенных" пикселей
-// off — цвет "выключенных" пикселей
+// NewColorProgress() cоздаёт виджет шкалы прогресса в виде цветных пикселей.
+// len — максимальная длина в пикселях.
+// on — цвет "включенных" пикселей.
+// off — цвет "выключенных" пикселей.
 // Добавлено в TUI v1.2.0
 func NewColorProgress(len int, on, off Color) *ColorProgress {
 	return &ColorProgress{
@@ -220,9 +220,15 @@ func NewColorProgress(len int, on, off Color) *ColorProgress {
 	}
 }
 
-// SetValue() устанавливает значение прогресса. Диапазон 0-1
+// SetValue() устанавливает значение прогресса. Диапазон 0-1.
 // Добавлено в TUI v1.2.0
 func (p *ColorProgress) SetValue(f float64) {
+	if f < 0 {
+		f = 0
+	}
+	if f > 1 {
+		f = 1
+	}
 	on := int(float64(p.size) * f)
 	p.text = fmt.Sprintf("\033[%dm%s\033[%dm%s\033[0m", p.clrOn+10, strings.Repeat(" ", on), p.clrOff+10, strings.Repeat(" ", p.size-on))
 	if currentWindow.IsRunned() {
@@ -243,5 +249,60 @@ func (p *ColorProgress) MaxLength() int {
 }
 
 func (p *ColorProgress) InnerText() string {
+	return p.text
+}
+
+// TextProgress — это виджет шкалы прогресса.
+// Добавлено в TUI v2.0.0
+type TextProgress struct {
+	text      string
+	size      int
+	sOn, sOff rune
+	idx       int
+}
+
+// NewTextProgress() cоздаёт виджет шкалы прогресса в виде текста.
+// len — максимальная длина в пикселях.
+// on — символ "включенных" пикселей.
+// off — символ "выключенных" пикселей.
+// Добавлено в TUI v2.0.0
+func NewTextProgress(len int, on, off rune) *TextProgress {
+	return &TextProgress{
+		text: strings.Repeat(" ", len),
+		size: len,
+		sOn:  on,
+		sOff: off,
+	}
+}
+
+// SetValue() устанавливает значение прогресса. Диапазон 0-1.
+// Добавлено в TUI v2.0.0
+func (p *TextProgress) SetValue(f float64) {
+	if f < 0 {
+		f = 0
+	}
+	if f > 1 {
+		f = 1
+	}
+	on := int(float64(p.size) * f)
+	p.text = fmt.Sprintf("%s%s", strings.Repeat(string(p.sOn), on), strings.Repeat(string(p.sOff), p.size-on))
+	if currentWindow.IsRunned() {
+		currentWindow.RedrawWidget(p.idx)
+	}
+}
+
+func (p *TextProgress) SetIndex(idx int) {
+	p.idx = idx
+}
+
+func (p *TextProgress) DisplayMode() DisplayMode {
+	return DisplayInline
+}
+
+func (p *TextProgress) MaxLength() int {
+	return p.size
+}
+
+func (p *TextProgress) InnerText() string {
 	return p.text
 }
