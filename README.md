@@ -7,10 +7,13 @@
 Фреймворк для разработки TUI-интерфейсов на Go.
 Преимущества:
 * Простой API
-* Небольшой размер ≈ 1МБ
+* Небольшой размер исполняемого файла ≈ 1МБ
 * Поддержка кастомной графики через Canvas
 * Поддержка конкурентности на уровне фреймворка
 * Поддержка Windows & Linux
+
+![Скриншот](examples/simple/1.PNG)
+
 ## Установка
 ```
 go get -u github.com/romanSPB15/go-tui
@@ -36,3 +39,5 @@ func main() {
 [Release Notes](https://github.com/romanSPB15/go-tui/blob/main/Release-Notes.md)
 |
 [Документация](https://pkg.go.dev/github.com/romanSPB15/go-tui@v2.0.0)
+|
+[Примеры](https://github.com/romanSPB15/go-tui/tree/main/examples)
