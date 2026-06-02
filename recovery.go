@@ -6,6 +6,7 @@ import (
 )
 
 func recoveryScreen(message string) {
+	currentApp.Quit()
 	fmt.Fprint(currentApp.f, "\033[2J\033[H")
 	fmt.Fprint(currentApp.f, "\033[44m")
 	w := currentApp.Window().Width()
