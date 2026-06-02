@@ -9,6 +9,7 @@ import (
 	"runtime"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/acarl005/stripansi"
 	"github.com/charmbracelet/x/term"
@@ -101,7 +102,7 @@ func (a *app) Redraw() {
 		for idx, c := range a.comp {
 			if c != nil {
 				if len(stripansi.Strip(c.InnerText())) > c.MaxLength() {
-					a.LogFatal("go-tui: text overflow")
+					a.LogFatal("Ошибка перерисовки: MaxLength() не верен.")
 				}
 				c.SetIndex(idx)
 				switch c.DisplayMode() {
@@ -176,14 +177,6 @@ func (a *app) Clear() {
 
 // Run() - это блокирующий запуск TUI-приложения. Если пользователь закроет окно, то будет произведён graceful shutdown и выход из метода.
 func (a *app) Run() {
-	if !term.IsTerminal(currentApp.f.Fd()) {
-		a.LogFatal("tui: stdout is not terminal")
-	}
-	if runtime.GOOS == "windows" {
-		EnableANSI()
-	}
-	a.runned = true
-
 	defer func() {
 		if a.debug {
 			a.log.Close()
@@ -192,6 +185,16 @@ func (a *app) Run() {
 			a.LogFatal("Произошла panic: %v", err)
 		}
 	}()
+	fmt.Fprintln(a.f, "Загрузка...")
+	if !term.IsTerminal(currentApp.f.Fd()) {
+		fmt.Fprintln(a.f, "Приложение запущено не в терминале. Выход...")
+		time.Sleep(time.Second * 3)
+		a.LogFatal("tui: stdout is not terminal")
+	}
+	if runtime.GOOS == "windows" {
+		EnableANSI()
+	}
+	a.runned = true
 
 	fmt.Fprint(a.f, "\033[?25l")
 
@@ -231,6 +234,8 @@ func (a *app) Run() {
 			}, "key handler")
 		}
 	}()
+
+	a.Redraw()
 
 	<-a.stopCh
 }
@@ -290,6 +295,7 @@ func (a *app) LogInfo(message string, args ...any) {
 
 // LogFatal() логирует указанное сообщение подобно fmt.Printf() в файл, если приложение создано как Debug. Потом в любом случае выходит
 func (a *app) LogFatal(message string, args ...any) {
+	recoveryScreen(fmt.Sprintf(message, args...))
 	if a.debug {
 		fmt.Fprintf(a.log, message+"\r\n", args...)
 	}
