@@ -11,14 +11,16 @@ type Widget interface {
 	DisplayMode() DisplayMode
 }
 
-// Focusable это интерфейс виджетов, которые могут получить фокус
+// Focusable это интерфейс виджетов, которые могут получить фокус.
+// Добавлено в TUI 2.0.0.
 type Focusable interface {
 	Widget
 	OnFocus()
 	OnBlur()
 }
 
-// Clickable это интерфейс виджетов, которые могут получить фокус и быть нажатыми
+// Clickable это интерфейс виджетов, которые могут получить фокус и быть нажатыми.
+// Добавлено в TUI 2.0.0.
 type Clickable interface {
 	Focusable
 	OnClick()

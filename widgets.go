@@ -171,7 +171,7 @@ type Button struct {
 func NewButton(text string) *Button {
 	btn := &Button{
 		clicked:   NewStaticLabel(text).ColorizeForeground(Blue),
-		selected:  NewStaticLabel(text).ColorizeBackground(White),
+		selected:  NewStaticLabel(text).ColorizeBackground(White).ColorizeForeground(Black),
 		base:      NewStaticLabel(text),
 		OnClicked: func() {},
 	}
@@ -180,14 +180,15 @@ func NewButton(text string) *Button {
 }
 
 func (btn *Button) OnFocus() {
-	// os.Exit(2)
 	btn.Widget = btn.selected
 	currentWindow.RedrawWidget(btn.idx)
 }
+
 func (btn *Button) OnBlur() {
 	btn.Widget = btn.base
 	currentWindow.RedrawWidget(btn.idx)
 }
+
 func (btn *Button) OnClick() {
 	btn.Widget = btn.clicked
 	currentWindow.RedrawWidget(btn.idx)
