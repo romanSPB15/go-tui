@@ -248,7 +248,7 @@ func (w *window) Run() {
 	})
 
 	w.RegisterKeyHandler(keyboard.KeyArrowRight, func() {
-		if w.focusIndex > len(w.compF) {
+		if w.focusIndex > len(w.compF)-2 {
 			return
 		}
 		if w.focusIndex == -1 {
@@ -257,8 +257,16 @@ func (w *window) Run() {
 			return
 		}
 		w.compF[w.focusIndex].OnBlur()
-		w.focusIndex--
+		w.focusIndex++
 		w.compF[w.focusIndex].OnFocus()
+	})
+
+	w.RegisterKeyHandler(keyboard.KeyEnter, func() {
+		if w.focusIndex != -1 {
+			if cl, ok := w.compF[w.focusIndex].(Clickable); ok {
+				cl.OnClick()
+			}
+		}
 	})
 
 	w.Redraw()
@@ -381,4 +389,8 @@ func (wnd *window) Height() int {
 		wnd.LogFatal("tui: get window size error")
 	}
 	return h
+}
+
+func CurrentWindow() Window {
+	return currentWindow
 }

@@ -19,6 +19,12 @@ type Focusable interface {
 	Index() int
 }
 
+// Clickable это интерфейс виджетов, которые могут получить фокус и быть нажатыми
+type Clickable interface {
+	Focusable
+	OnClick()
+}
+
 // Window — это объект окна приложения.
 type Window interface {
 	Widgets() []Widget    // Widgets() возвращает список компонентов, добавленных в приложение.
