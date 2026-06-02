@@ -158,11 +158,11 @@ func (l *newLine) SetIndex(int) {}
 // NewLine() создаёт компонент, занимающий весь остаток его строки, что переносит следующие на новую строку.
 func NewLine() Widget { return &newLine{} }
 
-// Button это объект кнопки, нажимающейся от нажатия её клавиши. Обработчик в OnClick.
+// Button это виджет кнопки Обработчик в OnClicked.
 type Button struct {
-	clicked Widget
-	base    Widget
-	OnClick func()
+	clicked   Widget
+	base      Widget
+	OnClicked func()
 	Widget
 	idx int
 }
@@ -171,24 +171,27 @@ type Button struct {
 // key это её клавиша.
 func NewButton(text string, key keyboard.Key) *Button {
 	btn := &Button{
-		clicked: NewStaticLabel(text).ColorizeForeground(Blue),
-		base:    NewStaticLabel(text),
-		OnClick: func() {},
+		clicked:   NewStaticLabel(text).ColorizeForeground(Blue),
+		base:      NewStaticLabel(text),
+		OnClicked: func() {},
 	}
 	btn.Widget = btn.base
-	currentWindow.RegisterKeyHandler(key, func() {
-		if btn.OnClick != nil {
-			btn.OnClick()
-		}
-		btn.Widget = btn.clicked
-		currentWindow.RedrawWidget(btn.idx)
-		currentWindow.LogInfo("%d %s", btn.idx, btn.InnerText())
-		time.Sleep(time.Millisecond * 50)
-		btn.Widget = btn.base
-		currentWindow.LogInfo("%d %s", btn.idx, btn.InnerText())
-		currentWindow.RedrawWidget(btn.idx)
-	})
 	return btn
+}
+
+func (btn *Button) OnFocus() {}
+func (btn *Button) OnBlur()  {}
+func (btn *Button) OnClick() {
+	btn.Widget = btn.clicked
+	currentWindow.RedrawWidget(btn.idx)
+	currentWindow.LogInfo("%d %s", btn.idx, btn.InnerText())
+	if btn.OnClicked != nil {
+		btn.OnClicked()
+	}
+	time.Sleep(time.Millisecond * 50)
+	btn.Widget = btn.base
+	currentWindow.LogInfo("%d %s", btn.idx, btn.InnerText())
+	currentWindow.RedrawWidget(btn.idx)
 }
 
 func (btn *Button) SetIndex(idx int) {
