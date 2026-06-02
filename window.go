@@ -237,8 +237,8 @@ func (w *window) Run() {
 		}
 	}()
 
-	if w.focusChange {
-		w.RegisterKeyHandler(keyboard.KeyTab, func() {
+	if w.focusChange && len(w.compF) != 0 {
+		w.RegisterKeyHandler(keyboard.KeyArrowLeft, func() {
 			if w.focusIndex <= 0 {
 				return
 			}
@@ -247,7 +247,7 @@ func (w *window) Run() {
 			w.compF[w.focusIndex].OnFocus()
 		})
 
-		w.RegisterKeyHandler(keyboard.KeyTab, func() {
+		w.RegisterKeyHandler(keyboard.KeyArrowRight, func() {
 			if w.focusIndex > len(w.compF)-2 {
 				return
 			}
@@ -274,6 +274,11 @@ func (w *window) Run() {
 
 	w.startScreenResizeChecker()
 
+	if len(w.compF) != 0 {
+		w.Do(func() {
+			w.compF[0].OnFocus()
+		})
+	}
 	<-w.stopCh
 }
 

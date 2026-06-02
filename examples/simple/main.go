@@ -10,5 +10,6 @@ func main() {
 	btn := tui.NewButton("Нажми на меня!")           // Создаём кнопку
 	btn.OnClicked = w.Quit                           // Назначаем обработчик
 	w.AddWidgets(btn)                                // Добавляем кнопку
+	w.AddWidgets(tui.NewButton("Кнопка 2"))          // Добавляем ещё кнопку
 	w.Run()                                          // Запускаем приложение
 }
