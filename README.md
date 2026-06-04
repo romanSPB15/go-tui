@@ -16,7 +16,7 @@
 
 ## Установка
 ```
-go get -u github.com/romanSPB15/tui-compose/v2@v2.0.0
+go get -u github.com/romanSPB15/tui-compose/v2@v2.0.1
 ```
 ## Пример использования
 ```go
