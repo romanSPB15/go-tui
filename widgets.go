@@ -318,7 +318,7 @@ func (p *TextProgress) InnerText() string {
 }
 
 // Check — виджет чекбокса.
-// Вызов OnClicked происходит при изменении состояния (после переключения).
+// Вызов OnChanged происходит при изменении состояния (после переключения).
 type Check struct {
 	base     Widget
 	checked  Widget
