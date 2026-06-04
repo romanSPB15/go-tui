@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/romanSPB15/go-tui"
+	"github.com/romanSPB15/tui-compose"
 )
 
 func main() {

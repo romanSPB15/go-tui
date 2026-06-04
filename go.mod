@@ -1,4 +1,4 @@
-module github.com/romanSPB15/go-tui
+module github.com/romanSPB15/tui-compose
 
 go 1.26.2
 
