@@ -1,10 +1,5 @@
 module github.com/romanSPB15/tui-compose/v2
 
-retract (
-    v1.0.0 // Неактуальная версия
-    v1.5.0 // Неактуальная версия
-)
-
 go 1.26.2
 
 require (

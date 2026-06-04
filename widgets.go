@@ -167,7 +167,6 @@ type Button struct {
 }
 
 // NewButton() создаёт кнопку.
-// key это её клавиша.
 func NewButton(text string) *Button {
 	btn := &Button{
 		clicked:   NewStaticLabel(text).ColorizeForeground(Blue),
@@ -316,4 +315,83 @@ func (p *TextProgress) MaxLength() int {
 
 func (p *TextProgress) InnerText() string {
 	return p.text
+}
+
+// Check — виджет чекбокса.
+// Вызов OnClicked происходит при изменении состояния (после переключения).
+type Check struct {
+	base     Widget
+	checked  Widget
+	selected Widget
+	Widget
+	idx          int
+	checkedState bool
+	OnChanged    func()
+}
+
+// NewCheck создаёт новый чекбокс с текстовой меткой.
+func NewCheck(text string) *Check {
+	c := &Check{
+		base:      NewStaticLabel(text),
+		checked:   NewStaticLabel(text).ColorizeForeground(Blue),
+		selected:  NewStaticLabel(text).ColorizeBackground(White).ColorizeForeground(Black),
+		OnChanged: func() {},
+	}
+	c.checkedState = false
+	c.Widget = c.base
+	return c
+}
+
+func (c *Check) OnFocus() {
+	if c.checkedState {
+		c.Widget = c.selected
+	} else {
+		c.Widget = c.selected
+	}
+	currentWindow.RedrawWidget(c.idx)
+}
+
+func (c *Check) OnBlur() {
+	if c.checkedState {
+		c.Widget = c.checked
+	} else {
+		c.Widget = c.base
+	}
+	currentWindow.RedrawWidget(c.idx)
+}
+
+func (c *Check) OnClick() {
+	c.checkedState = !c.checkedState
+	if c.checkedState {
+		c.Widget = c.checked
+	} else {
+		c.Widget = c.base
+	}
+	currentWindow.RedrawWidget(c.idx)
+	if c.OnChanged != nil {
+		c.OnChanged()
+	}
+}
+
+func (c *Check) SetIndex(idx int) {
+	c.idx = idx
+	c.base.SetIndex(idx)
+	c.checked.SetIndex(idx)
+	c.selected.SetIndex(idx)
+}
+
+// State() возвращает значение чекбокса.
+func (c *Check) State() bool {
+	return c.checkedState
+}
+
+// SetState() устанавливает значение чекбокса.
+func (c *Check) SetState(b bool) {
+	c.checkedState = b
+	if c.checkedState {
+		c.Widget = c.checked
+	} else {
+		c.Widget = c.base
+	}
+	currentWindow.RedrawWidget(c.idx)
 }
