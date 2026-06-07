@@ -3,12 +3,15 @@
 [![Latest release](https://img.shields.io/github/v/release/romanSPB15/tui)](https://github.com/romanSPB15/tui/releases)
 [![Go Reference](https://pkg.go.dev/badge/github.com/romanSPB15/go-tui.svg)](https://pkg.go.dev/github.com/romanSPB15/go-tui)
 
+> Старая версия v1
+
 ## Обзор
 Лёгкая библиотека для TUI на Go. Может:
 * Создавать надписи
 * Создавать и настраивать кнопки
 * Обрабатывать нажатия клавиатуры
 * Красить текст
+
 ## Установка
 ```
 go get -u github.com/romanSPB15/go-tui
