@@ -2,4 +2,8 @@
 
 package tui
 
-func recoveryScreen(message string) {}
+import "fmt"
+
+func recoveryScreen(message string) {
+	fmt.Fprint(w.f, "\033[2J\033[H")
+}
