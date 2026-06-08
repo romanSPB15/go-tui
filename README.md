@@ -16,14 +16,14 @@
 
 ## Установка
 ```
-go get -u github.com/romanSPB15/tui-compose
+go get -u github.com/romanSPB15/tui-compose/v2@v2.0.1
 ```
 ## Пример использования
 ```go
 package main
 
 import (
-	"github.com/romanSPB15/tui-compose"
+	"github.com/romanSPB15/tui-compose/v2"
 )
 
 func main() {
