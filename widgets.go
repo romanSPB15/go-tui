@@ -385,6 +385,14 @@ func (c *Check) SetIndex(idx int) {
 	c.selected.SetIndex(idx)
 }
 
+func (c *Check) DisplayMode() DisplayMode {
+	return DisplayInline
+}
+
+func (c *Check) MaxLength() int {
+	return len("[x] " + c.text)
+}
+
 // State() возвращает значение чекбокса.
 func (c *Check) State() bool {
 	return c.checkedState
